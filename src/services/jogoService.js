@@ -6,10 +6,6 @@ function cadastrarJogo(lista, jogo) {
   lista.push(jogo);
 }
 
-function listarJogos(lista) {
-  return lista;
-}
-
 function editarJogo(lista, id, dadosAtualizados) {
   const jogo = lista.find((jogo) => jogo.id === id);
 
@@ -30,14 +26,18 @@ function excluirJogo(lista, id) {
   lista.splice(indice, 1);
 }
 
+function listarJogos(lista) {
+  return lista;
+}
+
 function buscarJogoPorId(lista, id) {
   return lista.find((jogo) => jogo.id === id);
 }
 
 module.exports = {
   cadastrarJogo,
-  listarJogos,
   editarJogo,
   excluirJogo,
+  listarJogos,
   buscarJogoPorId,
 };
