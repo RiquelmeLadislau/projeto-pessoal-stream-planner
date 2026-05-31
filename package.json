@@ -1,0 +1,8 @@
+{
+  "name": "live-planner",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest",
+    "build": "echo Build executado com sucesso"
+  }
+}
