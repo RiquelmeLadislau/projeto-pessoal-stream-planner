@@ -1,6 +1,9 @@
 const {
   cadastrarLive,
   listarLives,
+  editarLive,
+  excluirLive,
+  buscarLivePorId,
 } = require("../services/liveService");
 
 describe("Live Service", () => {
@@ -76,5 +79,49 @@ describe("Live Service", () => {
     });
 
     expect(listarLives(lives)).toHaveLength(2);
+  });
+
+  test("deve editar uma live existente", () => {
+    cadastrarLive(lives, {
+      id: 1,
+      titulo: "Guardian Tales",
+      data: "2026-06-10",
+      horario: "20:00",
+      jogoId: 1,
+    });
+
+    editarLive(lives, 1, {
+      titulo: "Minecraft",
+    });
+
+    expect(lives[0].titulo).toBe("Minecraft");
+  });
+
+  test("deve excluir uma live existente", () => {
+    cadastrarLive(lives, {
+      id: 1,
+      titulo: "Guardian Tales",
+      data: "2026-06-10",
+      horario: "20:00",
+      jogoId: 1,
+    });
+
+    excluirLive(lives, 1);
+
+    expect(lives).toHaveLength(0);
+  });
+
+  test("deve buscar uma live pelo id", () => {
+    cadastrarLive(lives, {
+      id: 1,
+      titulo: "Guardian Tales",
+      data: "2026-06-10",
+      horario: "20:00",
+      jogoId: 1,
+    });
+
+    const live = buscarLivePorId(lives, 1);
+
+    expect(live.titulo).toBe("Guardian Tales");
   });
 });
