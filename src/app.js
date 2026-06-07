@@ -1,22 +1,11 @@
 const readline = require("readline");
 
-const {
-  cadastrarLive,
-  listarLives,
-  editarLive,
-  excluirLive,
-} = require("./services/liveService");
-
-const {
-  cadastrarJogo,
-  listarJogos,
-  editarJogo,
-  excluirJogo,
-} = require("./services/jogoService");
+const { cadastrarLive } = require("./services/liveService");
+const { cadastrarJogo, listarJogos } = require("./services/jogoService");
 
 const {
   gerarAgenda,
-  buscarPorTitulo,
+  buscarLivesPorJogo,
 } = require("./services/agendaService");
 
 const rl = readline.createInterface({
@@ -29,9 +18,7 @@ const lives = [];
 
 function perguntar(texto) {
   return new Promise((resolve) => {
-    rl.question(texto, (resposta) => {
-      resolve(resposta);
-    });
+    rl.question(texto, (resposta) => resolve(resposta));
   });
 }
 
@@ -40,13 +27,8 @@ function mostrarMenu() {
   console.log("1 - Cadastrar jogo");
   console.log("2 - Cadastrar live");
   console.log("3 - Listar jogos");
-  console.log("4 - Listar lives");
-  console.log("5 - Gerar agenda");
-  console.log("6 - Buscar live por título");
-  console.log("7 - Excluir live");
-  console.log("8 - Excluir jogo");
-  console.log("9 - Editar live");
-  console.log("10 - Editar jogo");
+  console.log("4 - Gerar agenda ordenada");
+  console.log("5 - Buscar lives por jogo");
   console.log("0 - Sair");
 }
 
@@ -75,14 +57,14 @@ async function cadastrarNovaLive() {
   });
 
   const titulo = await perguntar("Título da live: ");
-  const data = await perguntar("Data da live (DD-MM-AAAA): ");
+  const data = await perguntar("Data da live (DD/MM/AAAA): ");
   const horario = await perguntar("Horário da live (HH:MM): ");
   const jogoId = Number(await perguntar("Digite o ID do jogo escolhido: "));
 
   const jogoExiste = jogos.find((jogo) => jogo.id === jogoId);
 
   if (!jogoExiste) {
-    console.log("Jogo não encontrado. Cadastre a live novamente.");
+    console.log("Jogo não encontrado.");
     return;
   }
 
@@ -97,128 +79,47 @@ async function cadastrarNovaLive() {
   console.log("Live cadastrada com sucesso!");
 }
 
-function listarTodosJogos() {
-  console.log("\nJogos cadastrados:");
-
+function mostrarJogos() {
   if (jogos.length === 0) {
     console.log("Nenhum jogo cadastrado.");
     return;
   }
 
+  console.log("\nJogos cadastrados:");
   console.log(listarJogos(jogos));
 }
 
-function listarTodasLives() {
-  console.log("\nLives cadastradas:");
-
-  if (lives.length === 0) {
-    console.log("Nenhuma live cadastrada.");
-    return;
-  }
-
-  console.log(listarLives(lives));
-}
-
 function mostrarAgenda() {
-  console.log("\nAgenda:");
-
   if (lives.length === 0) {
     console.log("Nenhuma live cadastrada.");
     return;
   }
 
+  console.log("\nAgenda ordenada:");
   console.log(gerarAgenda(lives));
 }
 
-async function buscarLive() {
-  const titulo = await perguntar("Digite parte do título: ");
-  const resultado = buscarPorTitulo(lives, titulo);
-
-  if (!resultado) {
-    console.log("Nenhuma live encontrada.");
+async function buscarPorJogo() {
+  if (jogos.length === 0) {
+    console.log("Nenhum jogo cadastrado.");
     return;
   }
 
-  console.log("Live encontrada:");
+  console.log("\nJogos disponíveis:");
+  jogos.forEach((jogo) => {
+    console.log(`${jogo.id} - ${jogo.nome}`);
+  });
+
+  const jogoId = Number(await perguntar("Digite o ID do jogo: "));
+  const resultado = buscarLivesPorJogo(lives, jogoId);
+
+  if (resultado.length === 0) {
+    console.log("Nenhuma live encontrada para esse jogo.");
+    return;
+  }
+
+  console.log("Lives encontradas:");
   console.log(resultado);
-}
-
-async function removerLive() {
-  if (lives.length === 0) {
-    console.log("Nenhuma live cadastrada para remover.");
-    return;
-  }
-
-  console.log("\nLives cadastradas:");
-  lives.forEach((live) => {
-    console.log(`${live.id} - ${live.titulo}`);
-  });
-
-  const id = Number(await perguntar("ID da live: "));
-
-  excluirLive(lives, id);
-
-  console.log("Live removida com sucesso!");
-}
-
-async function removerJogo() {
-  if (jogos.length === 0) {
-    console.log("Nenhum jogo cadastrado para remover.");
-    return;
-  }
-
-  console.log("\nJogos cadastrados:");
-  jogos.forEach((jogo) => {
-    console.log(`${jogo.id} - ${jogo.nome}`);
-  });
-
-  const id = Number(await perguntar("ID do jogo: "));
-
-  excluirJogo(jogos, id);
-
-  console.log("Jogo removido com sucesso!");
-}
-
-async function alterarLive() {
-  if (lives.length === 0) {
-    console.log("Nenhuma live cadastrada para editar.");
-    return;
-  }
-
-  console.log("\nLives cadastradas:");
-  lives.forEach((live) => {
-    console.log(`${live.id} - ${live.titulo}`);
-  });
-
-  const id = Number(await perguntar("ID da live: "));
-  const novoTitulo = await perguntar("Novo título: ");
-
-  editarLive(lives, id, {
-    titulo: novoTitulo,
-  });
-
-  console.log("Live atualizada com sucesso!");
-}
-
-async function alterarJogo() {
-  if (jogos.length === 0) {
-    console.log("Nenhum jogo cadastrado para editar.");
-    return;
-  }
-
-  console.log("\nJogos cadastrados:");
-  jogos.forEach((jogo) => {
-    console.log(`${jogo.id} - ${jogo.nome}`);
-  });
-
-  const id = Number(await perguntar("ID do jogo: "));
-  const novoNome = await perguntar("Novo nome: ");
-
-  editarJogo(jogos, id, {
-    nome: novoNome,
-  });
-
-  console.log("Jogo atualizado com sucesso!");
 }
 
 async function iniciarApp() {
@@ -234,21 +135,11 @@ async function iniciarApp() {
       } else if (opcao === "2") {
         await cadastrarNovaLive();
       } else if (opcao === "3") {
-        listarTodosJogos();
+        mostrarJogos();
       } else if (opcao === "4") {
-        listarTodasLives();
-      } else if (opcao === "5") {
         mostrarAgenda();
-      } else if (opcao === "6") {
-        await buscarLive();
-      } else if (opcao === "7") {
-        await removerLive();
-      } else if (opcao === "8") {
-        await removerJogo();
-      } else if (opcao === "9") {
-        await alterarLive();
-      } else if (opcao === "10") {
-        await alterarJogo();
+      } else if (opcao === "5") {
+        await buscarPorJogo();
       } else if (opcao === "0") {
         console.log("Encerrando o sistema...");
       } else {
