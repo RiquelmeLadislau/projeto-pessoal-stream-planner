@@ -1,7 +1,7 @@
 # 🎮 Stream Planner
 
 > Sistema de gerenciamento e planejamento de transmissões ao vivo para criadores de conteúdo.
-
+> arquivo em pdf:
 ---
 
 ## 📋 Sumário
@@ -87,14 +87,62 @@ Dessa forma, o usuário consegue visualizar e planejar suas transmissões de man
 
 ## Casos de Teste
 
-| ID | Caso de Teste | Descrição |
-|----|---------------|-----------|
-| CT01 | Cadastro Válido de Jogos | Verificar se um jogo é cadastrado corretamente quando os dados são informados de forma válida. |
-| CT02 | Cadastro Válido de Lives | Verificar se uma live é cadastrada corretamente quando todos os campos obrigatórios são preenchidos. |
-| CT03 | Validação de Campos Obrigatórios | Verificar se o sistema impede o cadastro quando informações obrigatórias não forem preenchidas. |
-| CT04 | Busca de Lives por Jogo | Verificar se o sistema retorna corretamente as lives relacionadas ao jogo pesquisado. |
-| CT05 | Geração da Agenda Ordenada | Verificar se a agenda é exibida corretamente em ordem cronológica. |
-| CT06 | Testes de Integração | Verificar a comunicação entre os módulos de jogos, lives e agenda. |
+### 🎮 Jogo Service — `jogo.test.js`
+
+| ID | Descrição | Entrada | Resultado Esperado | Tipo |
+|----|-----------|---------|-------------------|------|
+| CT01 | Deve cadastrar um jogo válido | `id:1, nome:"Guardian Tales", genero:"RPG"` | Lista com 1 jogo | ✅ Válido |
+| CT02 | Não deve cadastrar jogo sem nome | `nome: ""` | Lança exceção: `"Nome do jogo é obrigatório"` | ❌ Inválido |
+| CT03 | Deve listar todos os jogos | Guardian Tales + Minecraft cadastrados | Lista com 2 jogos | ✅ Válido |
+| CT04 | Deve editar um jogo existente | `editarJogo(jogos, 1, { nome: "Minecraft" })` | `jogos[0].nome === "Minecraft"` | ✅ Válido |
+| CT05 | Deve excluir um jogo existente | `excluirJogo(jogos, 1)` | Lista vazia | ✅ Válido |
+| CT06 | Deve buscar um jogo pelo id | `buscarJogoPorId(jogos, 1)` | `jogo.nome === "Guardian Tales"` | ✅ Válido |
+
+---
+
+### 📺 Live Service — `live.test.js`
+
+| ID | Descrição | Entrada | Resultado Esperado | Tipo |
+|----|-----------|---------|-------------------|------|
+| CT07 | Deve cadastrar uma live válida | `titulo:"Guardian Tales", data:"2026-06-10", horario:"20:00"` | Lista com 1 live | ✅ Válido |
+| CT08 | Não deve cadastrar live sem título | `titulo: ""` | Lança exceção: `"Título é obrigatório"` | ❌ Inválido |
+| CT09 | Não deve cadastrar live sem data | `data: ""` | Lança exceção: `"Data é obrigatória"` | ❌ Inválido |
+| CT10 | Não deve cadastrar live sem horário | `horario: ""` | Lança exceção: `"Horário é obrigatório"` | ❌ Inválido |
+| CT11 | Deve listar todas as lives cadastradas | Guardian Tales + Minecraft cadastrados | Lista com 2 lives | ✅ Válido |
+| CT12 | Deve editar uma live existente | `editarLive(lives, 1, { titulo: "Minecraft" })` | `lives[0].titulo === "Minecraft"` | ✅ Válido |
+| CT13 | Deve excluir uma live existente | `excluirLive(lives, 1)` | Lista vazia | ✅ Válido |
+| CT14 | Deve buscar uma live pelo id | `buscarLivePorId(lives, 1)` | `live.titulo === "Guardian Tales"` | ✅ Válido |
+
+---
+
+### 📅 Agenda Service — `agenda.test.js`
+
+| ID | Descrição | Entrada | Resultado Esperado | Tipo |
+|----|-----------|---------|-------------------|------|
+| CT15 | Deve gerar agenda ordenada por data e horário | 3 lives em datas/horários diferentes | Ordem: Valorant → Guardian Tales → Minecraft | ✅ Válido |
+| CT16 | Deve filtrar lives por dia | `filtrarPorDia(lives, "2026-06-10")` | 2 lives retornadas | ✅ Válido |
+| CT17 | Deve buscar live pelo título | `buscarPorTitulo(lives, "Guardian")` | `resultado.titulo === "Live de Guardian Tales"` | ✅ Válido |
+| CT18 | Deve buscar lives por jogo | `buscarLivesPorJogo(lives, 1)` | 1 live com título `"Live de Guardian Tales"` | ✅ Válido |
+
+---
+
+### 🔗 Teste de Integração — `integracao.test.js`
+
+| ID | Descrição | Fluxo | Resultado Esperado | Tipo |
+|----|-----------|-------|-------------------|------|
+| CT19 | Deve cadastrar jogo, live e gerar agenda | `cadastrarJogo` → `cadastrarLive` → `gerarAgenda` | 1 jogo, 1 live e agenda com título correto | ✅ Válido |
+
+---
+
+### 📊 Resumo dos Casos de Teste
+
+| Módulo | Total | ✅ Válidos | ❌ Inválidos |
+|--------|-------|-----------|------------|
+| Jogo Service | 6 | 5 | 1 |
+| Live Service | 8 | 5 | 3 |
+| Agenda Service | 4 | 4 | 0 |
+| Integração | 1 | 1 | 0 |
+| **TOTAL** | **19** | **15** | **4** |
 
 ---
 
@@ -123,7 +171,8 @@ stream-planner/
 ├── tests/
 │   ├── jogo.test.js
 │   ├── live.test.js
-│   └── agenda.test.js
+│   ├── agenda.test.js
+│   └── integracao.test.js
 │
 ├── .github/
 │   └── workflows/
@@ -209,6 +258,8 @@ main
 O projeto **Stream Planner** atingiu o objetivo de solucionar a dificuldade de organização de transmissões ao vivo, permitindo o gerenciamento de jogos, lives e agendas de forma simples e eficiente.
 
 Além das funcionalidades desenvolvidas, o projeto aplicou conceitos profissionais de qualidade de software, incluindo testes automatizados, build, jobs, steps, branches, pipeline, Pull Request e GitHub Actions, seguindo as práticas de CI/CD.
+
+Ao todo, foram implementados **19 casos de teste** cobrindo os módulos de Jogo, Live, Agenda e Integração, garantindo a corretude das funcionalidades e a robustez das validações do sistema.
 
 ---
 
