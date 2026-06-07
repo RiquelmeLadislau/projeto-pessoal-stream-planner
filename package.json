@@ -1,0 +1,12 @@
+{
+  "name": "live-planner",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest",
+    "build": "echo Build executado com sucesso"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
+  }
+}
