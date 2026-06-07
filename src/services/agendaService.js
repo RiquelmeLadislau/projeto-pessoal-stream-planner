@@ -1,10 +1,22 @@
+function converterData(data) {
+  const partes = data.split("/");
+  const dia = partes[0];
+  const mes = partes[1];
+  const ano = partes[2];
+
+  return `${ano}-${mes}-${dia}`;
+}
+
 function gerarAgenda(lives) {
   return [...lives].sort((a, b) => {
-    if (a.data === b.data) {
+    const dataA = converterData(a.data);
+    const dataB = converterData(b.data);
+
+    if (dataA === dataB) {
       return a.horario.localeCompare(b.horario);
     }
 
-    return a.data.localeCompare(b.data);
+    return dataA.localeCompare(dataB);
   });
 }
 
