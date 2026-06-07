@@ -30,8 +30,13 @@ function buscarPorTitulo(lives, titulo) {
   );
 }
 
+function buscarLivesPorJogo(lives, jogoId) {
+  return lives.filter((live) => live.jogoId === jogoId);
+}
+
 module.exports = {
   gerarAgenda,
   filtrarPorDia,
   buscarPorTitulo,
+  buscarLivesPorJogo,
 };

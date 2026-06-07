@@ -2,10 +2,17 @@ const {
   gerarAgenda,
   filtrarPorDia,
   buscarPorTitulo,
+  buscarLivesPorJogo,
 } = require("../services/agendaService");
 
 describe("Agenda Service", () => {
   let lives;
+    test("deve buscar lives por jogo", () => {
+      const resultado = buscarLivesPorJogo(lives, 1);
+
+      expect(resultado).toHaveLength(1);
+      expect(resultado[0].titulo).toBe("Live de Guardian Tales");
+  });
 
   beforeEach(() => {
     lives = [
